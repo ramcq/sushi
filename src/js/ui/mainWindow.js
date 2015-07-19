@@ -50,7 +50,6 @@ const MainWindow = new Lang.Class({
     _init : function(args) {
         args = args || {};
 
-        this._background = null;
         this._isFullScreen = false;
         this._pendingRenderer = null;
         this._renderer = null;
@@ -83,14 +82,13 @@ const MainWindow = new Lang.Class({
         this._gtkWindow.set_visual(screen.get_rgba_visual());
 
         this._gtkWindow.connect('delete-event',
-                                Lang.bind(this, this._onWindowDeleteEvent));
-        this._gtkWindow.connect('realize', Lang.bind(this,
-            function() {
-                // don't support maximize and minimize
-                this._gtkWindow.get_window().set_functions(Gdk.WMFunction.MOVE |
-                                                           Gdk.WMFunction.RESIZE |
-                                                           Gdk.WMFunction.CLOSE);
-            }));
+                                Lang.bind(this, this._onDeleteEvent));
+        this._gtkWindow.connect('key-press-event',
+				Lang.bind(this, this._onKeyPressEvent));
+        this._gtkWindow.connect('motion-notify-event',
+                                Lang.bind(this, this._onMotionNotifyEvent));
+        this._gtkWindow.connect('realize',
+                                Lang.bind(this, this._onRealize));
 
         this._embed = new Gtk.Overlay();
         this._gtkWindow.add(this._embed);
@@ -111,60 +109,27 @@ const MainWindow = new Lang.Class({
                                                   blue: 0,
                                                   alpha: 255 }));
 
-        this._mainLayout = new Clutter.BinLayout();
-        this._mainGroup = new Clutter.Actor({ layout_manager: this._mainLayout });
-        this._mainGroup.add_constraint(
-            new Clutter.BindConstraint({ coordinate: Clutter.BindCoordinate.SIZE,
-                                         source: this._stage }));
-        this._stage.add_actor(this._mainGroup);
-
-        this._gtkWindow.connect('key-press-event',
-				Lang.bind(this, this._onKeyPressEvent));
-        this._gtkWindow.connect('motion-notify-event',
-                                Lang.bind(this, this._onMotionNotifyEvent));
+        this._stage.set_layout_manager(new Clutter.BinLayout());
 
         this._stage.connect('button-press-event',
                             Lang.bind(this, this._onButtonPressEvent));
     },
 
-    _createSolidBackground: function() {
-        if (this._background)
-            return;
-
-        this._background = new Clutter.Rectangle();
-        this._background.set_opacity(255);
-        this._background.set_color(new Clutter.Color({ red: 0,
-                                                       green: 0,
-                                                       blue: 0,
-                                                       alpha: 255 }));
-
-        this._mainLayout.add(this._background, Clutter.BinAlignment.FILL, Clutter.BinAlignment.FILL);
-        this._background.lower_bottom();
-    },
-
-    _createAlphaBackground: function() {
-        if (this._background)
-            return;
-
-        this._background = new Clutter.Actor();
-        this._background.set_background_color(new Clutter.Color({ red: 0,
-                                                                  green: 0,
-                                                                  blue: 0,
-                                                                  alpha: 255 }));
-        this._background.set_opacity(Constants.VIEW_BACKGROUND_OPACITY);
-        this._mainLayout.add(this._background, Clutter.BinAlignment.FILL, Clutter.BinAlignment.FILL);
-
-        this._background.lower_bottom();
-    },
-
     /**************************************************************************
      ****************** main object event callbacks ***************************
      **************************************************************************/
-    _onWindowDeleteEvent : function() {
+    _onDeleteEvent : function() {
         this._clearAndQuit();
     },
 
-    _onKeyPressEvent : function(actor, event) {
+    _onRealize: function() {
+        // don't support maximize and minimize
+        this._gtkWindow.get_window().set_functions(Gdk.WMFunction.MOVE |
+                                                   Gdk.WMFunction.RESIZE |
+                                                   Gdk.WMFunction.CLOSE);
+    },
+
+    _onKeyPressEvent : function(widget, event) {
         let key = event.get_keyval()[1];
 
         if (key == Gdk.KEY_Escape ||
@@ -329,9 +294,12 @@ const MainWindow = new Lang.Class({
                                           factor: 0.5,
                                           align_axis: Clutter.AlignAxis.Y_AXIS });
         this._texture.add_constraint(this._textureYAlign);
+        this._texture.add_constraint(
+            new Clutter.BindConstraint({ coordinate: Clutter.BindCoordinate.SIZE,
+                                         source: this._stage }));
 
         this.refreshSize();
-        this._mainGroup.add_child(this._texture);
+        this._stage.add_child(this._texture);
     },
 
     /**************************************************************************
@@ -341,18 +309,13 @@ const MainWindow = new Lang.Class({
         this._stage.disconnect(this._unFullScreenId);
         this._unFullScreenId = 0;
 
-	/* We want the alpha background back now */
-        this._background.destroy();
-        this._background = null;
-        this._createAlphaBackground();
-
         this._textureYAlign.factor = this._savedYFactor;
 
         let textureSize = this._getTextureSize();
         this._texture.set_size(textureSize[0],
                                textureSize[1]);
 
-        Tweener.addTween(this._mainGroup,
+        Tweener.addTween(this._texture,
                          { opacity: 255,
                            time: 0.15,
                            transition: 'easeOutQuad'
@@ -373,7 +336,7 @@ const MainWindow = new Lang.Class({
         /* quickly fade out everything,
          * and then unfullscreen the (empty) window.
          */
-        Tweener.addTween(this._mainGroup,
+        Tweener.addTween(this._texture,
                          { opacity: 0,
                            time: 0.10,
                            transition: 'easeOutQuad',
@@ -388,13 +351,8 @@ const MainWindow = new Lang.Class({
         this._stage.disconnect(this._fullScreenId);
         this._fullScreenId = 0;
 
-        /* We want a solid black background */
-        this._background.destroy();
-        this._background = null;
-	this._createSolidBackground();
-
 	/* Fade in everything */
-        Tweener.addTween(this._mainGroup,
+        Tweener.addTween(this._texture,
                          { opacity: 255,
                            time: 0.15,
                            transition: 'easeOutQuad'
@@ -439,7 +397,7 @@ const MainWindow = new Lang.Class({
         /* quickly fade out everything,
          * and then fullscreen the (empty) window.
          */
-        Tweener.addTween(this._mainGroup,
+        Tweener.addTween(this._texture,
                          { opacity: 0,
                            time: 0.10,
                            transition: 'easeOutQuad',
@@ -530,7 +488,6 @@ const MainWindow = new Lang.Class({
 
     setFile : function(file) {
 	this.file = file;
-        this._createAlphaBackground();
         this._createRenderer(file);
         this._createTexture();
         this._createToolbar();
