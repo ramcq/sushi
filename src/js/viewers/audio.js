@@ -261,10 +261,6 @@ const AudioRenderer = new Lang.Class({
         this._mainToolbar.set_icon_size(Gtk.IconSize.MENU);
         this._mainToolbar.show();
 
-        this._toolbarActor = new GtkClutter.Actor({ contents: this._mainToolbar,
-                                                    opacity: 0,
-                                                    x_expand: true });
-
         this._toolbarPlay = new Gtk.ToolButton({ icon_name: 'media-playback-pause-symbolic' });
         this._toolbarPlay.show();
         this._mainToolbar.insert(this._toolbarPlay, 0);
@@ -305,7 +301,7 @@ const AudioRenderer = new Lang.Class({
         item.show_all();
         this._mainToolbar.insert(item, 3);
 
-        return this._toolbarActor;
+        return this._mainToolbar;
     },
 });
 

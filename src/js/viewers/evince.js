@@ -129,8 +129,6 @@ const EvinceRenderer = new Lang.Class({
         this._mainToolbar.set_show_arrow(false);
         this._mainToolbar.show();
 
-        this._toolbarActor = new GtkClutter.Actor({ contents: this._mainToolbar });
-
         this._toolbarBack = new Gtk.ToolButton({ expand: false,
                                                  icon_name: 'go-previous-symbolic' });
         this._toolbarBack.show();
@@ -163,7 +161,7 @@ const EvinceRenderer = new Lang.Class({
 
         this._updatePageLabel();
 
-        return this._toolbarActor;
+        return this._mainToolbar;
     },
 
     clear : function() {

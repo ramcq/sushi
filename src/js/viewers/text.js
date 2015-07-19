@@ -117,9 +117,7 @@ const TextRenderer = new Lang.Class({
 
         this._mainToolbar.show();
 
-        this._toolbarActor = new GtkClutter.Actor({ contents: this._mainToolbar });
-
-        return this._toolbarActor;
+        return this._mainToolbar;
     }
 });
 

@@ -103,12 +103,10 @@ const ImageRenderer = new Lang.Class({
         this._mainToolbar.set_show_arrow(false);
         this._mainToolbar.show();
 
-        this._toolbarActor = new GtkClutter.Actor({ contents: this._mainToolbar });
-
         this._toolbarZoom = Utils.createFullScreenButton(this._mainWindow);
         this._mainToolbar.insert(this._toolbarZoom, 0);
 
-        return this._toolbarActor;
+        return this._mainToolbar;
     },
 });
 
