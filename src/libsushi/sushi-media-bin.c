@@ -97,6 +97,8 @@ typedef struct
   GtkLabel *title_label;
   GtkLabel *info_column_label[INFO_N_COLUMNS];
   GtkLabel *duration_label;
+  GtkLabel *progress_duration_label;
+  GtkLabel *progress_position_label;
 
   /* Thanks to GSK all the blitting will be done in GL */
   GtkRevealer *top_revealer;
@@ -821,10 +823,6 @@ sushi_media_bin_init_volume_button (SushiMediaBin    *self,
     }
 
   gtk_style_context_add_class (gtk_widget_get_style_context (popup), "sushi-media-bin");
-
-  /* Hide volume popup buttons */
-  gtk_widget_hide (gtk_scale_button_get_plus_button (button));
-  gtk_widget_hide (gtk_scale_button_get_minus_button (button));
 }
 
 static void
@@ -1178,6 +1176,8 @@ sushi_media_bin_class_init (SushiMediaBinClass *klass)
   gtk_widget_class_bind_template_child_private (widget_class, SushiMediaBin, title_label);
   gtk_widget_class_bind_template_child_private (widget_class, SushiMediaBin, info_box);
   gtk_widget_class_bind_template_child_private (widget_class, SushiMediaBin, duration_label);
+  gtk_widget_class_bind_template_child_private (widget_class, SushiMediaBin, progress_duration_label);
+  gtk_widget_class_bind_template_child_private (widget_class, SushiMediaBin, progress_position_label);
   gtk_widget_class_bind_template_child_private (widget_class, SushiMediaBin, top_revealer);
   gtk_widget_class_bind_template_child_private (widget_class, SushiMediaBin, bottom_revealer);
 
@@ -1413,6 +1413,7 @@ sushi_media_bin_update_duration (SushiMediaBin *self)
 
   duration = GST_TIME_AS_SECONDS (duration);
   gtk_label_set_label (priv->duration_label, format_time (duration));
+  gtk_label_set_label (priv->progress_duration_label, format_time (duration));
   gtk_adjustment_set_upper (priv->playback_adjustment, duration);
 }
 
@@ -1431,6 +1432,7 @@ sushi_media_bin_update_position (SushiMediaBin *self)
   gtk_adjustment_set_value (priv->playback_adjustment, position);
   priv->ignore_adjustment_changes = FALSE;
 
+  gtk_label_set_label (priv->progress_position_label, format_time (position));
   gtk_label_set_label (priv->audio_position_label, format_time (position));
 }
 
@@ -1558,7 +1560,7 @@ sushi_media_bin_handle_msg_state_changed (SushiMediaBin *self, GstMessage *msg)
   if (old_state == GST_STATE_READY && new_state == GST_STATE_PAUSED)
     {
       gtk_image_set_from_icon_name (priv->playback_image, SMB_ICON_NAME_PLAY, SMB_ICON_SIZE);
-      widget_set_visible (priv->play_box, TRUE);
+      widget_set_visible (priv->play_box, FALSE);
       sushi_media_bin_update_duration (self);
     }
   else if (new_state == GST_STATE_PLAYING)
@@ -1570,7 +1572,7 @@ sushi_media_bin_handle_msg_state_changed (SushiMediaBin *self, GstMessage *msg)
   else
     {
       gtk_image_set_from_icon_name (priv->playback_image, SMB_ICON_NAME_PLAY, SMB_ICON_SIZE);
-      widget_set_visible (priv->play_box, TRUE);
+      widget_set_visible (priv->play_box, FALSE);
       priv->position = 0;
       sushi_media_bin_set_tick_enabled (self, FALSE);
     }
