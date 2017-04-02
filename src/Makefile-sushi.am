@@ -7,15 +7,27 @@ sushi_cflags = \
     -DGST_USE_UNSTABLE_API \
     $(SUSHI_CFLAGS)
 
+lib_resource_files = $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=$(srcdir)/libsushi --generate-dependencies $(srcdir)/libsushi/org.gnome.Libsushi.gresource.xml)
+libsushi/sushi-lib-resources.c: libsushi/org.gnome.Libsushi.gresource.xml $(lib_resource_files)
+	mkdir -p libsushi && \
+	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=$(srcdir)/libsushi --generate-source --c-name sushi $(srcdir)/libsushi/org.gnome.Libsushi.gresource.xml
+libsushi/sushi-lib-resources.h: libsushi/org.gnome.Libsushi.gresource.xml $(lib_resource_files)
+	mkdir -p libsushi && \
+	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=$(srcdir)/libsushi --generate-header --c-name sushi $(srcdir)/libsushi/org.gnome.Libsushi.gresource.xml
+EXTRA_DIST += libsushi/org.gnome.Libsushi.gresource.xml $(lib_resource_files)
+
 sushi_built_sources = \
     sushi-enum-types.h \
-    sushi-enum-types.c
+    sushi-enum-types.c \
+    libsushi/sushi-lib-resources.h \
+    libsushi/sushi-lib-resources.c
 
 BUILT_SOURCES += $(sushi_built_sources)
 SUSHI_STAMP_FILES = stamp-sushi-enum-types.h
 
 sushi_source_h = \
     libsushi/sushi-cover-art.h \
+    libsushi/sushi-media-bin.h \
     libsushi/sushi-pdf-loader.h \
     libsushi/sushi-sound-player.h \
     libsushi/sushi-file-loader.h \
@@ -26,6 +38,7 @@ sushi_source_h = \
 
 sushi_source_c = \
     libsushi/sushi-cover-art.c \
+    libsushi/sushi-media-bin.c \
     libsushi/sushi-pdf-loader.c \
     libsushi/sushi-sound-player.c \
     libsushi/sushi-file-loader.c \
