@@ -24,7 +24,6 @@
  */
 
 const Gdk = imports.gi.Gdk;
-const GtkClutter = imports.gi.GtkClutter;
 const Gtk = imports.gi.Gtk;
 const GLib = imports.gi.GLib;
 const GtkSource = imports.gi.GtkSource;
@@ -66,7 +65,7 @@ const TextRenderer = new Lang.Class({
     },
 
     render : function() {
-        return this._actor;
+        return this._scrolledWin;
     },
 
     _onBufferLoaded : function(loader, buffer) {
@@ -98,8 +97,6 @@ const TextRenderer = new Lang.Class({
         this._scrolledWin.add(this._view);
         this._scrolledWin.show_all();
 
-        this._actor = new GtkClutter.Actor({ contents: this._scrolledWin });
-        this._actor.set_reactive(true);
         this._callback();
     },
 
