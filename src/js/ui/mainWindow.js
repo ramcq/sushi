@@ -61,7 +61,6 @@ const MainWindow = new Lang.Class({
 
         this._application = args.application;
         this._createGtkWindow();
-        this._createClutterEmbed();
 
 	this.file = null;
     },
@@ -79,6 +78,8 @@ const MainWindow = new Lang.Class({
         let screen = Gdk.Screen.get_default();
         this._gtkWindow.set_visual(screen.get_rgba_visual());
 
+        this._gtkWindow.connect('button-press-event',
+                                Lang.bind(this, this._onButtonPressEvent));
         this._gtkWindow.connect('delete-event',
                                 Lang.bind(this, this._onDeleteEvent));
         this._gtkWindow.connect('key-press-event',
@@ -90,27 +91,6 @@ const MainWindow = new Lang.Class({
 
         this._embed = new Gtk.Overlay();
         this._gtkWindow.add(this._embed);
-    },
-
-    _createClutterEmbed : function() {
-        this._clutterEmbed = new GtkClutter.Embed();
-        this._embed.add(this._clutterEmbed);
-
-        this._clutterEmbed.set_receives_default(true);
-        this._clutterEmbed.set_can_default(true);
-
-        this._stage = this._clutterEmbed.get_stage();
-        this._stage.set_use_alpha(true);
-        this._stage.set_opacity(0);
-        this._stage.set_color(new Clutter.Color({ red: 0,
-                                                  green: 0,
-                                                  blue: 0,
-                                                  alpha: 255 }));
-
-        this._stage.set_layout_manager(new Clutter.BinLayout());
-
-        this._stage.connect('button-press-event',
-                            Lang.bind(this, this._onButtonPressEvent));
     },
 
     /**************************************************************************
@@ -142,21 +122,14 @@ const MainWindow = new Lang.Class({
         return false;
     },
 
-    _onButtonPressEvent : function(actor, event) {
-        let stageWin = ClutterGdk.get_stage_window(this._stage);
-        let win_coords = event.get_coords();
-
-        if ((event.get_source() == this._texture &&
-             !this._renderer.moveOnClick)) {
+    _onButtonPressEvent : function(window, event) {
+        if (!this._renderer.moveOnClick)
             return false;
-        }
 
-        let root_coords = stageWin.get_root_coords(win_coords[0],
-                                                   win_coords[1]);
-
-        this._gtkWindow.begin_move_drag(event.get_button(),
-                                        root_coords[0],
-                                        root_coords[1],
+        let [, rootX, rootY] = event.get_root_coords();
+        let [, button] = event.get_button();
+        this._gtkWindow.begin_move_drag(button,
+                                        rootX, rootY,
                                         event.get_time());
 
         return false;
@@ -200,26 +173,7 @@ const MainWindow = new Lang.Class({
     },
 
     _positionTexture : function() {
-        let yFactor = 0;
-
-        let textureSize = this._getTextureSize();
         let windowSize = this._getWindowSize();
-
-        if (textureSize[0] < Constants.VIEW_MIN &&
-            textureSize[1] < Constants.VIEW_MIN) {
-            yFactor = 0.52;
-        }
-
-        if (yFactor == 0) {
-            if (this._isFullScreen &&
-               (textureSize[0] > textureSize[1]))
-                yFactor = 0.52;
-            else
-                yFactor = 0.92;
-        }
-
-        this._texture.set_size(textureSize[0], textureSize[1]);
-        this._textureYAlign.factor = yFactor;
 
         if (this._lastWindowSize &&
             windowSize[0] == this._lastWindowSize[0] &&
@@ -286,17 +240,11 @@ const MainWindow = new Lang.Class({
         }
 
         this._texture = this._renderer.render();
-        this._textureYAlign =
-            new Clutter.AlignConstraint({ source: this._stage,
-                                          factor: 0.5,
-                                          align_axis: Clutter.AlignAxis.Y_AXIS });
-        this._texture.add_constraint(this._textureYAlign);
-        this._texture.add_constraint(
-            new Clutter.BindConstraint({ coordinate: Clutter.BindCoordinate.SIZE,
-                                         source: this._stage }));
+        this._texture.expand = true;
+        this._texture.show();
 
+        this._embed.add(this._texture);
         this.refreshSize();
-        this._stage.add_child(this._texture);
     },
 
     /**************************************************************************
