@@ -265,7 +265,12 @@ const MainWindow = new Lang.Class({
 
         if (this._renderer.createToolbar) {
             let rendererToolbar = this._renderer.createToolbar();
-            this._toolbar = new Gtk.Revealer({ transition_duration: 250,
+            this._toolbar = new Gtk.Revealer({ valign: Gtk.Align.END,
+                                               hexpand: true,
+                                               margin_bottom: Constants.TOOLBAR_SPACING,
+                                               margin_start: Constants.TOOLBAR_SPACING,
+                                               margin_end: Constants.TOOLBAR_SPACING,
+                                               transition_duration: 250,
                                                transition_type: Gtk.RevealerTransitionType.CROSSFADE,
                                                visible: true });
             this._toolbar.add(rendererToolbar);
@@ -273,12 +278,6 @@ const MainWindow = new Lang.Class({
 
         if (!this._toolbar)
             return;
-
-        this._toolbar.margin_bottom = Constants.TOOLBAR_SPACING;
-        this._toolbar.margin_start = Constants.TOOLBAR_SPACING;
-        this._toolbar.margin_end = Constants.TOOLBAR_SPACING;
-        this._toolbar.halign = Gtk.Align.CENTER;
-        this._toolbar.valign = Gtk.Align.END;
 
         this._embed.add_overlay(this._toolbar);
     },

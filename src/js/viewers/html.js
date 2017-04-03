@@ -66,7 +66,8 @@ const HTMLRenderer = new Lang.Class({
     },
 
     createToolbar : function() {
-        this._mainToolbar = new Gtk.Toolbar({ icon_size: Gtk.IconSize.MENU });
+        this._mainToolbar = new Gtk.Toolbar({ icon_size: Gtk.IconSize.MENU,
+                                              halign: Gtk.Align.CENTER });
         this._mainToolbar.get_style_context().add_class('osd');
         this._mainToolbar.set_show_arrow(false);
         this._mainToolbar.show();
