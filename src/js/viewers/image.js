@@ -23,10 +23,11 @@
  *
  */
 
+const Gdk = imports.gi.Gdk;
 const GdkPixbuf = imports.gi.GdkPixbuf;
-const GtkClutter = imports.gi.GtkClutter;
-const Gtk = imports.gi.Gtk;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
+const Gtk = imports.gi.Gtk;
 
 const Gettext = imports.gettext.domain('sushi');
 const _ = Gettext.gettext;
@@ -34,6 +35,94 @@ const Lang = imports.lang;
 
 const MimeHandler = imports.ui.mimeHandler;
 const Utils = imports.ui.utils;
+
+const Image = new Lang.Class({
+    Name: 'Image',
+    Extends: Gtk.DrawingArea,
+    Properties: {
+        'pix': GObject.ParamSpec.object('pix', '', '',
+                                        GObject.ParamFlags.READWRITE,
+                                        GdkPixbuf.Pixbuf)
+    },
+
+    _init: function() {
+        this._pix = null;
+        this._scaledSurface = null;
+
+        this.parent();
+    },
+
+    _ensureScaledPix: function() {
+        let scaleFactor = this.get_scale_factor();
+        let width = this.get_allocated_width() * scaleFactor;
+        let height = this.get_allocated_height() * scaleFactor;
+
+        // Downscale original to fit, if necessary
+        let origWidth = this._pix.get_width();
+        let origHeight = this._pix.get_height();
+
+        let scaleX = origWidth / width;
+        let scaleY = origHeight / height;
+        let scale = Math.max(scaleX, scaleY);
+
+        let newWidth;
+        let newHeight;
+
+        if (scale < 1) {
+            newWidth = Math.min(width, origWidth * scaleFactor);
+            newHeight = Math.min(height, origHeight * scaleFactor);
+        } else {
+            newWidth = Math.floor(origWidth / scale);
+            newHeight = Math.floor(origHeight / scale);
+        }
+
+        let scaledWidth = this._scaledSurface ? this._scaledSurface.getWidth() : 0;
+        let scaledHeight = this._scaledSurface ? this._scaledSurface.getHeight() : 0;
+
+        if (newWidth != scaledWidth || newHeight != scaledHeight) {
+            let scaledPixbuf = this._pix.scale_simple(newWidth, newHeight,
+                                                      GdkPixbuf.InterpType.BILINEAR);
+            this._scaledSurface = Gdk.cairo_surface_create_from_pixbuf(scaledPixbuf,
+                                                                       scaleFactor,
+                                                                       this.get_window());
+        }
+    },
+
+    vfunc_get_preferred_width: function() {
+        return [1, this._pix ? this.pix.get_width() : 1];
+    },
+
+    vfunc_get_preferred_height: function() {
+        return [1, this._pix ? this.pix.get_height() : 1];
+    },
+
+    vfunc_size_allocate: function(allocation) {
+        this.parent(allocation);
+        this._ensureScaledPix();
+    },
+
+    vfunc_draw: function(context) {
+        let width = this.get_allocated_width();
+        let height = this.get_allocated_height();
+
+        let scaleFactor = this.get_scale_factor();
+        let offsetX = (width - this._scaledSurface.getWidth() / scaleFactor) / 2;
+        let offsetY = (height - this._scaledSurface.getHeight() / scaleFactor) / 2;
+
+        context.setSourceSurface(this._scaledSurface, offsetX, offsetY);
+        context.paint();
+        return false;
+    },
+
+    set pix(p) {
+        this._pix = p;
+        this.queue_resize();
+    },
+
+    get pix() {
+        return this._pix;
+    }
+});
 
 const ImageRenderer = new Lang.Class({
     Name: 'ImageRenderer',
@@ -56,6 +145,8 @@ const ImageRenderer = new Lang.Class({
     },
 
     _createImageTexture : function(file) {
+        this._texture = new Image();
+
         file.read_async
         (GLib.PRIORITY_DEFAULT, null,
          Lang.bind(this,
@@ -74,9 +165,7 @@ const ImageRenderer = new Lang.Class({
          Lang.bind(this, function(obj, res) {
              let pix = GdkPixbuf.Pixbuf.new_from_stream_finish(res);
              pix = pix.apply_embedded_orientation();
-
-             this._texture = new GtkClutter.Texture({ keep_aspect_ratio: true });
-             this._texture.set_from_pixbuf(pix);
+             this._texture.pix = pix;
 
              /* we're ready now */
              this._callback();
@@ -92,9 +181,10 @@ const ImageRenderer = new Lang.Class({
          }));
     },
 
-    getSizeForAllocation : function(allocation, fullScreen) {
-        let baseSize = this._texture.get_base_size();
-        return Utils.getScaledSize(baseSize, allocation, fullScreen);
+    getSizeForAllocation : function(allocation) {
+        let width = this._texture.pix.get_width();
+        let height = this._texture.pix.get_height();
+        return Utils.getScaledSize([width, height], allocation, false);
     },
 
     createToolbar : function() {
