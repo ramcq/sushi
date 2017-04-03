@@ -154,8 +154,8 @@ const MainWindow = new Lang.Class({
         let screenSize = [ this._gtkWindow.get_window().get_width(),
                            this._gtkWindow.get_window().get_height() ];
 
-        let availableWidth = this._isFullScreen ? screenSize[0] : Constants.VIEW_MAX_W - 2 * Constants.VIEW_PADDING_X;
-        let availableHeight = this._isFullScreen ? screenSize[1] : Constants.VIEW_MAX_H - Constants.VIEW_PADDING_Y;
+        let availableWidth = this._isFullScreen ? screenSize[0] : Constants.VIEW_MAX_W;
+        let availableHeight = this._isFullScreen ? screenSize[1] : Constants.VIEW_MAX_H;
 
         let textureSize = this._renderer.getSizeForAllocation([availableWidth, availableHeight], this._isFullScreen);
 
@@ -166,12 +166,11 @@ const MainWindow = new Lang.Class({
         let textureSize = this._getTextureSize();
         let windowSize = textureSize;
 
-        if (textureSize[0] < (Constants.VIEW_MIN - 2 * Constants.VIEW_PADDING_X) &&
-            textureSize[1] < (Constants.VIEW_MIN - Constants.VIEW_PADDING_Y)) {
+        if (textureSize[0] < Constants.VIEW_MIN &&
+            textureSize[1] < Constants.VIEW_MIN) {
             windowSize = [ Constants.VIEW_MIN, Constants.VIEW_MIN ];
         } else if (!this._isFullScreen) {
-            windowSize = [ windowSize[0] + 2 * Constants.VIEW_PADDING_X,
-                           windowSize[1] + Constants.VIEW_PADDING_Y ];
+            windowSize = [ windowSize[0], windowSize[1] ];
         }
 
         return windowSize;
