@@ -100,7 +100,7 @@ const MainWindow = new Lang.Class({
         if (!this._renderer)
             return;
 
-        this._positionTexture();
+        this._resizeWindow();
     },
 
     _onKeyPressEvent : function(widget, event) {
@@ -141,33 +141,22 @@ const MainWindow = new Lang.Class({
     /**************************************************************************
      *********************** texture allocation *******************************
      **************************************************************************/
-    _getTextureSize : function() {
-        let screenSize = [ this.get_window().get_width(),
-                           this.get_window().get_height() ];
-
-        let availableWidth = this._isFullScreen ? screenSize[0] : Constants.VIEW_MAX_W;
-        let availableHeight = this._isFullScreen ? screenSize[1] : Constants.VIEW_MAX_H;
-
-        let textureSize = this._renderer.getSizeForAllocation([availableWidth, availableHeight], this._isFullScreen);
-
-        return textureSize;
-    },
-
     _getWindowSize : function() {
-        let textureSize = this._getTextureSize();
+        let textureSize = this._renderer.getSizeForAllocation(
+            [Constants.VIEW_MAX_W, Constants.VIEW_MAX_H]);
         let windowSize = textureSize;
 
         if (textureSize[0] < Constants.VIEW_MIN &&
-            textureSize[1] < Constants.VIEW_MIN) {
+            textureSize[1] < Constants.VIEW_MIN)
             windowSize = [ Constants.VIEW_MIN, Constants.VIEW_MIN ];
-        } else if (!this._isFullScreen) {
-            windowSize = [ windowSize[0], windowSize[1] ];
-        }
 
         return windowSize;
     },
 
-    _positionTexture : function() {
+    _resizeWindow : function() {
+        if (this._isFullScreen)
+            return;
+
         let windowSize = this._getWindowSize();
 
         if (this._lastWindowSize &&
@@ -176,9 +165,7 @@ const MainWindow = new Lang.Class({
             return;
 
         this._lastWindowSize = windowSize;
-
-        if (!this._isFullScreen)
-            this.resize(windowSize[0], windowSize[1]);
+        this.resize(windowSize[0], windowSize[1]);
     },
 
     _createRenderer : function(file) {
@@ -238,7 +225,7 @@ const MainWindow = new Lang.Class({
         this._texture.show();
 
         this._embed.add(this._texture);
-        this.refreshSize();
+        this._resizeWindow();
     },
 
     /**************************************************************************
@@ -329,10 +316,6 @@ const MainWindow = new Lang.Class({
 
     setTitle : function(label) {
         this.set_title(label);
-    },
-
-    refreshSize : function() {
-        this._positionTexture();
     },
 
     toggleFullScreen : function() {

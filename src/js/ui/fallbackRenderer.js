@@ -146,7 +146,7 @@ const FallbackRenderer = new Lang.Class({
             this._image.set_from_pixbuf(this._fileLoader.icon);
 
         this._applyLabels();
-        this._mainWindow.refreshSize();
+        this._mainWindow.queue_allocate();
     },
 
     clear : function() {

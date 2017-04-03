@@ -44,7 +44,7 @@ const GstRenderer = new Lang.Class({
         this._player = new Sushi.MediaBin({ uri: file.get_uri() });
         this._player.play();
         this._player.connect('size-change', function() {
-            mainWindow.refreshSize();
+            mainWindow.queue_allocate();
         });
         callback();
     },

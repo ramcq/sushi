@@ -188,7 +188,7 @@ const AudioRenderer = new Lang.Class({
 
         this._artFetcher.taglist = tags;
 
-        this._mainWindow.refreshSize();
+        this._mainWindow.queue_allocate();
     },
 
     _updateProgressBar : function() {
