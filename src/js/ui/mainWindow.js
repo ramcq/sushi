@@ -148,8 +148,7 @@ const MainWindow = new Lang.Class({
         let stageWin = ClutterGdk.get_stage_window(this._stage);
         let win_coords = event.get_coords();
 
-        if ((event.get_source() == this._quitActor) ||
-            (event.get_source() == this._texture &&
+        if ((event.get_source() == this._texture &&
              !this._renderer.moveOnClick)) {
             return false;
         }
