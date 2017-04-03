@@ -38,7 +38,6 @@ const Sushi = imports.gi.Sushi;
 const Constants = imports.util.constants;
 const MimeHandler = imports.ui.mimeHandler;
 const SpinnerBox = imports.ui.spinnerBox;
-const Utils = imports.ui.utils;
 
 const MainWindow = new Lang.Class({
     Name: 'MainWindow',

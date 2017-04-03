@@ -32,8 +32,6 @@ const Gettext = imports.gettext.domain('sushi');
 const _ = Gettext.gettext;
 const Lang = imports.lang;
 
-const Utils = imports.ui.utils;
-
 const FallbackRenderer = new Lang.Class({
     Name: 'FallbackRenderer',
 

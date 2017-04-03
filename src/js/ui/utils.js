@@ -28,8 +28,6 @@ const Gtk = imports.gi.Gtk;
 
 const Lang = imports.lang;
 
-const Constants = imports.util.constants;
-
 function getScaledSize(baseSize, allocSize, upscale) {
     let allocW = allocSize[0];
     let allocH = allocSize[1];

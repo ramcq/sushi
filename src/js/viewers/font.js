@@ -24,7 +24,6 @@
  */
 
 const MimeHandler = imports.ui.mimeHandler;
-const Utils = imports.ui.utils;
 
 const Lang = imports.lang;
 
