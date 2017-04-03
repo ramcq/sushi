@@ -30,12 +30,6 @@ const Lang = imports.lang;
 
 const Constants = imports.util.constants;
 
-let slowDownFactor = 0;
-
-function setSlowDownFactor(factor) {
-    slowDownFactor = factor;
-}
-
 function getScaledSize(baseSize, allocSize, upscale) {
     let allocW = allocSize[0];
     let allocH = allocSize[1];
