@@ -32,7 +32,6 @@ const Gettext = imports.gettext.domain('sushi');
 const _ = Gettext.gettext;
 const Lang = imports.lang;
 
-const Constants = imports.util.constants;
 const Utils = imports.ui.utils;
 
 const FallbackRenderer = new Lang.Class({
@@ -162,11 +161,6 @@ const FallbackRenderer = new Lang.Class({
     getSizeForAllocation : function(allocation) {
         let width = this._box.get_preferred_width()[1];
         let height = this._box.get_preferred_height()[1];
-
-        if (width < Constants.VIEW_MIN &&
-            height < Constants.VIEW_MIN) {
-            width = Constants.VIEW_MIN;
-        }
 
         /* never make it shrink; this could happen when the
          * spinner hides.

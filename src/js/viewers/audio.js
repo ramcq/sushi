@@ -243,11 +243,6 @@ const AudioRenderer = new Lang.Class({
         let width = this._box.get_preferred_width();
         let height = this._box.get_preferred_height();
 
-        if (width[1] < Constants.VIEW_MIN &&
-            height[1] < Constants.VIEW_MIN) {
-            width[1] = Constants.VIEW_MIN;
-        }
-
         /* return the natural */
         return [ width[1], height[1] ];
     },
