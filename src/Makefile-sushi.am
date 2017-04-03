@@ -98,7 +98,6 @@ Sushi_1_0_gir_LIBS = libsushi-1.0.la
 Sushi_1_0_gir_CFLAGS = $(AM_CPPFLAGS) $(sushi_cflags)
 Sushi_1_0_gir_SCANNERFLAGS = --warn-all --symbol-prefix=sushi --identifier-prefix=Sushi
 Sushi_1_0_gir_INCLUDES = \
-    Clutter-1.0 \
     GstPbutils-1.0 \
     GstTag-1.0 \
     GdkPixbuf-2.0 \

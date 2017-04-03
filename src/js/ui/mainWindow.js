@@ -25,14 +25,11 @@
 
 imports.gi.versions.GdkX11 = '3.0';
 
-const Clutter = imports.gi.Clutter;
-const ClutterGdk = imports.gi.ClutterGdk;
 const Gdk = imports.gi.Gdk;
 const GdkX11 = imports.gi.GdkX11;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
-const GtkClutter = imports.gi.GtkClutter;
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 const Pango = imports.gi.Pango;
