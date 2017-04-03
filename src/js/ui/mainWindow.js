@@ -84,6 +84,8 @@ const MainWindow = new Lang.Class({
                                 Lang.bind(this, this._onMotionNotifyEvent));
         this._gtkWindow.connect('realize',
                                 Lang.bind(this, this._onRealize));
+        this._gtkWindow.connect('size-allocate',
+                                Lang.bind(this, this._onSizeAllocate));
 
         this._embed = new Gtk.Overlay();
         this._gtkWindow.add(this._embed);
@@ -101,6 +103,13 @@ const MainWindow = new Lang.Class({
         this._gtkWindow.get_window().set_functions(Gdk.WMFunction.MOVE |
                                                    Gdk.WMFunction.RESIZE |
                                                    Gdk.WMFunction.CLOSE);
+    },
+
+    _onSizeAllocate: function() {
+        if (!this._renderer)
+            return;
+
+        this._positionTexture();
     },
 
     _onKeyPressEvent : function(widget, event) {
