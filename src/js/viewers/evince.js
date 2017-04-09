@@ -42,9 +42,6 @@ const EvinceRenderer = new Lang.Class({
     _init : function(args) {
         EvDoc.init();
 
-        this._pdfLoader = null;
-        this._document = null;
-
         this.moveOnClick = false;
         this.canFullScreen = true;
     },
@@ -65,10 +62,8 @@ const EvinceRenderer = new Lang.Class({
     },
 
     _updatePageLabel : function() {
-        let curPage, totPages;
-
-        curPage = this._model.get_page();
-        totPages = this._document.get_n_pages();
+        let curPage = this._model.get_page();
+        let totPages = this._model.document.get_n_pages();
 
         this._toolbarBack.set_sensitive(curPage > 0);
         this._toolbarForward.set_sensitive(curPage < totPages - 1);
@@ -76,17 +71,13 @@ const EvinceRenderer = new Lang.Class({
         this._pageLabel.set_text(_("%d of %d").format(curPage + 1, totPages));
     },
 
-    _onDocumentLoaded : function() {
-        this._document = this._pdfLoader.document;
-        this._model = EvView.DocumentModel.new_with_document(this._document);
+    _onDocumentLoaded : function(pdfLoader) {
+        this._model = EvView.DocumentModel.new_with_document(pdfLoader.document);
 
         this._model.set_sizing_mode(EvView.SizingMode.FIT_WIDTH);
 	this._model.set_continuous(true);
 
-        this._model.connect('page-changed',
-                            Lang.bind(this, function() {
-                                this._updatePageLabel();
-                            }));
+        this._model.connect('page-changed', Lang.bind(this, this._updatePageLabel));
 
         this._view = EvView.View.new();
         this._view.show();
@@ -162,8 +153,6 @@ const EvinceRenderer = new Lang.Class({
     },
 
     clear : function() {
-        this._pdfLoader.cleanup_document();
-        this._document = null;
         this._pdfLoader = null;
     }
 });
