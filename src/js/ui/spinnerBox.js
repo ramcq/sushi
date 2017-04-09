@@ -28,17 +28,13 @@ const _ = Gettext.gettext;
 const Gtk = imports.gi.Gtk;
 
 const Lang = imports.lang;
-const Mainloop = imports.mainloop;
 
 let SPINNER_SIZE = 48;
-let TIMEOUT = 500;
 
 const SpinnerBox = new Lang.Class({
     Name: 'SpinnerBox',
 
     _init : function(args) {
-        this._timeoutId = 0;
-
         this.canFullScreen = false;
         this.moveOnClick = true;
 
@@ -52,6 +48,8 @@ const SpinnerBox = new Lang.Class({
                                          spacing: 12 });
         this._spinnerBox.pack_start(this._spinner, true, true, 0);
         this._spinnerBox.pack_start(this._label, true, true, 0);
+
+        this._spinnerBox.show_all();
     },
 
     render : function() {
@@ -64,27 +62,11 @@ const SpinnerBox = new Lang.Class({
                  spinnerSize[0].height ];
     },
 
-    startTimeout : function() {
-        if (this._timeoutId)
-            return;
-
+    start : function() {
         this._spinner.start();
-        this._timeoutId = Mainloop.timeout_add(TIMEOUT,
-                                               Lang.bind(this,
-                                                         this._onTimeoutCompleted));
     },
 
     destroy : function() {
-        if (this._timeoutId) {
-            Mainloop.source_remove(this._timeoutId);
-            this._timeoutId = 0;
-        }
-
         this._spinnerBox.destroy();
-    },
-
-    _onTimeoutCompleted : function() {
-        this._timeoutId = 0;
-        this._spinnerBox.show_all();
-    },
+    }
 });
