@@ -118,6 +118,7 @@ const Image = new Lang.Class({
 
     set pix(p) {
         this._pix = p;
+        this._scaledSurface = null;
         this.queue_resize();
     },
 
