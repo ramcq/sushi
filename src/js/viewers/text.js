@@ -47,10 +47,10 @@ const TextRenderer = new Lang.Class({
         this._file = file;
         this._callback = callback;
 
-        this._textLoader = new Sushi.TextLoader();
-        this._textLoader.connect('loaded',
-                                 Lang.bind(this, this._onBufferLoaded));
-        this._textLoader.uri = file.get_uri();
+        let textLoader = new Sushi.TextLoader();
+        textLoader.connect('loaded',
+                           Lang.bind(this, this._onBufferLoaded));
+        textLoader.uri = file.get_uri();
 
         this._geditScheme = 'tango';
         let schemaName = 'org.gnome.gedit.preferences.editor';
