@@ -45,6 +45,7 @@ const SpinnerBox = new Lang.Class({
         this._label.set_text(_("Loading…"));
 
         this._spinnerBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
+                                         valign: Gtk.Align.CENTER,
                                          spacing: 12 });
         this._spinnerBox.pack_start(this._spinner, true, true, 0);
         this._spinnerBox.pack_start(this._label, true, true, 0);
