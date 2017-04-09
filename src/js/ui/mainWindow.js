@@ -177,13 +177,9 @@ const MainWindow = new Lang.Class({
             return;
 
         let windowSize = this._getWindowSize();
-
-        if (this._lastWindowSize &&
-            windowSize[0] == this._lastWindowSize[0] &&
-            windowSize[1] == this._lastWindowSize[1])
+        if (windowSize[0] <= 0 || windowSize[1] <= 0)
             return;
 
-        this._lastWindowSize = windowSize;
         this.resize(windowSize[0], windowSize[1]);
     },
 
