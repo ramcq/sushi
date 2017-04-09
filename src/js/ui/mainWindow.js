@@ -164,9 +164,6 @@ const MainWindow = new Lang.Class({
 
         let windowSize = this._renderer.getSizeForAllocation(
             [Constants.VIEW_MAX_W, Constants.VIEW_MAX_H]);
-        if (windowSize[0] <= 0 || windowSize[1] <= 0)
-            return;
-
         this.resize(windowSize[0], windowSize[1]);
     },
 
