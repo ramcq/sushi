@@ -74,7 +74,7 @@ const MainWindow = new Lang.Class({
         this._isFullScreen = false;
         this._pendingRenderer = null;
         this._renderer = null;
-        this._texture = null;
+        this._view = null;
         this._toolbar = null;
         this._toolbarId = 0;
         this.file = null;
@@ -229,21 +229,21 @@ const MainWindow = new Lang.Class({
         this._pendingRenderer = null;
 
         /* generate the texture and toolbar for the new renderer */
-        this._createTexture();
+        this._createView();
         this._createToolbar();
     },
 
-    _createTexture : function() {
-        if (this._texture) {
-            this._texture.destroy();
-            this._texture = null;
+    _createView : function() {
+        if (this._view) {
+            this._view.destroy();
+            this._view = null;
         }
 
-        this._texture = this._renderer.render();
-        this._texture.expand = true;
-        this._texture.show();
+        this._view = this._renderer.render();
+        this._view.expand = true;
+        this._view.show();
 
-        this._embed.add(this._texture);
+        this._embed.add(this._view);
         this._resizeWindow();
     },
 
@@ -327,7 +327,7 @@ const MainWindow = new Lang.Class({
     setFile : function(file) {
 	this.file = file;
         this._createRenderer(file);
-        this._createTexture();
+        this._createView();
         this._createToolbar();
 
         this.show_all();
