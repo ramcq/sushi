@@ -167,16 +167,12 @@ const MainWindow = new Lang.Class({
     /**************************************************************************
      *********************** texture allocation *******************************
      **************************************************************************/
-    _getWindowSize : function() {
-        return this._renderer.getSizeForAllocation(
-            [Constants.VIEW_MAX_W, Constants.VIEW_MAX_H]);
-    },
-
     _resizeWindow : function() {
         if (this._isFullScreen)
             return;
 
-        let windowSize = this._getWindowSize();
+        let windowSize = this._renderer.getSizeForAllocation(
+            [Constants.VIEW_MAX_W, Constants.VIEW_MAX_H]);
         if (windowSize[0] <= 0 || windowSize[1] <= 0)
             return;
 
