@@ -101,8 +101,6 @@ const MainWindow = new Lang.Class({
                      Lang.bind(this, this._onMotionNotifyEvent));
         this.connect('realize',
                      Lang.bind(this, this._onRealize));
-        this.connect('size-allocate',
-                     Lang.bind(this, this._onSizeAllocate));
 
         this._embed = new Embed();
         this.add(this._embed);
@@ -120,13 +118,6 @@ const MainWindow = new Lang.Class({
         this.get_window().set_functions(Gdk.WMFunction.MOVE |
                                         Gdk.WMFunction.RESIZE |
                                         Gdk.WMFunction.CLOSE);
-    },
-
-    _onSizeAllocate: function() {
-        if (!this._renderer)
-            return;
-
-        this._resizeWindow();
     },
 
     _onKeyPressEvent : function(widget, event) {
@@ -167,7 +158,7 @@ const MainWindow = new Lang.Class({
     /**************************************************************************
      *********************** texture allocation *******************************
      **************************************************************************/
-    _resizeWindow : function() {
+    resizeWindow : function() {
         if (this._isFullScreen)
             return;
 
@@ -236,7 +227,7 @@ const MainWindow = new Lang.Class({
         this._view.show();
 
         this._embed.add(this._view);
-        this._resizeWindow();
+        this.resizeWindow();
     },
 
     /**************************************************************************
