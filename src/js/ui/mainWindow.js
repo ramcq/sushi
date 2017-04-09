@@ -37,6 +37,35 @@ const Constants = imports.util.constants;
 const MimeHandler = imports.ui.mimeHandler;
 const SpinnerBox = imports.ui.spinnerBox;
 
+const Embed = new Lang.Class({
+    Name: 'Embed',
+    Extends: Gtk.Overlay,
+
+    vfunc_get_request_mode: function() {
+        return Gtk.SizeRequestMode.HEIGHT_FOR_WIDTH;
+    },
+
+    vfunc_get_preferred_width: function() {
+        let [min, nat] = this.parent();
+
+        min = Math.max(min, Constants.VIEW_MIN);
+        nat = Math.max(nat, Constants.VIEW_MIN);
+
+        return [min, nat];
+    },
+
+    vfunc_get_preferred_height_for_width: function(forWidth) {
+        let [min, nat] = this.parent(forWidth);
+
+        if (forWidth <= Constants.VIEW_MIN) {
+            min = Math.max(min, Constants.VIEW_MIN);
+            nat = Math.max(nat, Constants.VIEW_MIN);
+        }
+
+        return [min, nat];
+    }
+});
+
 const MainWindow = new Lang.Class({
     Name: 'MainWindow',
     Extends: Gtk.Window,
@@ -75,7 +104,7 @@ const MainWindow = new Lang.Class({
         this.connect('size-allocate',
                      Lang.bind(this, this._onSizeAllocate));
 
-        this._embed = new Gtk.Overlay();
+        this._embed = new Embed();
         this.add(this._embed);
     },
 
@@ -139,15 +168,8 @@ const MainWindow = new Lang.Class({
      *********************** texture allocation *******************************
      **************************************************************************/
     _getWindowSize : function() {
-        let textureSize = this._renderer.getSizeForAllocation(
+        return this._renderer.getSizeForAllocation(
             [Constants.VIEW_MAX_W, Constants.VIEW_MAX_H]);
-        let windowSize = textureSize;
-
-        if (textureSize[0] < Constants.VIEW_MIN &&
-            textureSize[1] < Constants.VIEW_MIN)
-            windowSize = [ Constants.VIEW_MIN, Constants.VIEW_MIN ];
-
-        return windowSize;
     },
 
     _resizeWindow : function() {
