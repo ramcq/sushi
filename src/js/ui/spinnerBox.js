@@ -54,6 +54,7 @@ const SpinnerBox = new Lang.Class({
     },
 
     render : function() {
+        this._spinner.start();
         return this._spinnerBox;
     },
 
@@ -61,13 +62,5 @@ const SpinnerBox = new Lang.Class({
         let spinnerSize = this._spinnerBox.get_preferred_size();
         return [ spinnerSize[0].width,
                  spinnerSize[0].height ];
-    },
-
-    start : function() {
-        this._spinner.start();
-    },
-
-    destroy : function() {
-        this._spinnerBox.destroy();
     }
 });

@@ -182,7 +182,6 @@ const MainWindow = new Lang.Class({
          * if the loading takes too long.
          */
         this._renderer = new SpinnerBox.SpinnerBox();
-        this._renderer.start();
 
         file.query_info_async
         (Gio.FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME + ',' +
@@ -205,9 +204,6 @@ const MainWindow = new Lang.Class({
     },
 
     _onRendererPrepared : function() {
-        /* destroy the spinner renderer */
-        this._renderer.destroy();
-
         this._renderer = this._pendingRenderer;
         this._pendingRenderer = null;
 
